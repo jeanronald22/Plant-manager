@@ -1,7 +1,6 @@
 package com.dev.plant_management.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,19 +16,20 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class WateringNeed {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 
-    @NotBlank
     @Column(nullable = false)
     private int frequencyInDays;
 
-    @NotBlank
     @Column(nullable = false)
     private double quantityInLiters;
+
+    @Column(nullable = true) // a remettre a false
+    private LocalDateTime nextWateringDate =  LocalDateTime.now();
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plant_id", nullable = false)

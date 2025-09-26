@@ -4,6 +4,8 @@ import com.dev.plant_management.entity.Plant;
 import com.dev.plant_management.entity.UserEntity;
 import com.dev.plant_management.exceptions.PlantErrorCode;
 import com.dev.plant_management.exceptions.PlantNotFoundException;
+import com.dev.plant_management.payload.request.PlantRequest;
+import com.dev.plant_management.payload.response.PlantResponse;
 import com.dev.plant_management.service.CustomUserDetailService;
 import com.dev.plant_management.service.PlantService;
 import jakarta.validation.Valid;
@@ -26,30 +28,30 @@ public class PlantController {
     private final CustomUserDetailService userService;
 
     @PostMapping("/create/{userId}")
-    public ResponseEntity<Plant> createPlant(@Valid  @PathVariable UUID userId, @RequestBody Plant plant) {
+    public ResponseEntity<PlantResponse> createPlant(@PathVariable UUID userId, @RequestBody PlantRequest request) {
         UserEntity owner = userService.findById(userId)
                 .orElseThrow(() -> new PlantNotFoundException(DATA_ERROR_USER_NOT_FOUND));
 
-        Plant savedPlant = plantService.savePlant(plant, owner);
+        PlantResponse savedPlant = plantService.savePlant(request, owner);
         return ResponseEntity.ok(savedPlant);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Plant> getPlantById(@Valid @PathVariable Long id) {
+    public ResponseEntity<PlantResponse> getPlantById(@Valid @PathVariable Long id) {
         return plantService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new PlantNotFoundException(DATA_ERROR_PLANT_NOT_FOUND));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Plant>> getPlantsByUser(@PathVariable UUID userId) {
+    public ResponseEntity<List<PlantResponse>> getPlantsByUser(@PathVariable UUID userId) {
         UserEntity owner = userService.findById(userId)
                 .orElseThrow(() -> new PlantNotFoundException(DATA_ERROR_USER_NOT_FOUND));
         return ResponseEntity.ok(plantService.findByOwner(owner));
     }
 
     @GetMapping
-    public ResponseEntity<List<Plant>> getAllPlants() {
+    public ResponseEntity<List<PlantResponse>> getAllPlants() {
         return ResponseEntity.ok(plantService.findAll());
     }
 

@@ -1,11 +1,13 @@
 package com.dev.plant_management.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +25,17 @@ public class Plant {
     private Long id;
 
 
+    @NotBlank
+    @Column(unique = true, nullable = false)
     private String name;
+
+    @NotBlank
+    @Column( nullable = false)
+    private String imageUrl;
+
+
+    @Column(nullable = false)
+    private LocalDate purchaseDate;
 
     @Enumerated(EnumType.STRING)
     private Espece espece;

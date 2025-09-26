@@ -3,40 +3,47 @@ package com.dev.plant_management.service.implementations;
 
 import com.dev.plant_management.entity.Plant;
 import com.dev.plant_management.entity.WateringHistory;
+import com.dev.plant_management.payload.request.WateringHistoryRequest;
+import com.dev.plant_management.payload.response.WateringHistoryResponse;
+import com.dev.plant_management.payload.response.WateringNeedResponse;
 import com.dev.plant_management.repository.WateringHistoryRepository;
 import com.dev.plant_management.service.WateringHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class WateringHistoryServiceImpl implements WateringHistoryService {
 
     private final WateringHistoryRepository wateringHistoryRepository;
+    private final ModelMapper mapper;
 
     @Override
-    public WateringHistory saveHistory(WateringHistory history, Plant plant) {
+    public WateringHistoryResponse saveHistory(WateringHistoryRequest request, Plant plant) {
+        WateringHistory history = mapper.map(request, WateringHistory.class);
         history.setPlant(plant);
-        return wateringHistoryRepository.save(history);
+        return mapper.map(wateringHistoryRepository.save(history), WateringHistoryResponse.class);
     }
 
     @Override
-    public Optional<WateringHistory> findById(Long id) {
-        return wateringHistoryRepository.findById(id);
+    public Optional<WateringHistoryResponse> findById(Long id) {
+        return Optional.ofNullable(mapper.map(wateringHistoryRepository.findById(id), WateringHistoryResponse.class));
     }
 
     @Override
-    public List<WateringHistory> findByPlant(Plant plant) {
-        return wateringHistoryRepository.findByPlant(plant);
+    public List<WateringHistoryResponse> findByPlant(Plant plant) {
+        return wateringHistoryRepository.findByPlant(plant).stream().map(it ->
+                mapper.map(it, WateringHistoryResponse.class)).toList();
     }
 
     @Override
-    public List<WateringHistory> findAll() {
-        return wateringHistoryRepository.findAll();
+    public List<WateringHistoryResponse> findAll() {
+        return wateringHistoryRepository.findAll().stream().map(it ->
+                mapper.map(it, WateringHistoryResponse.class)).toList();
     }
 
     @Override

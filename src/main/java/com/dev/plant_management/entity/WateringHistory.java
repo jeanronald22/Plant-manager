@@ -23,12 +23,8 @@ public class WateringHistory {
     private Long id;
 
 
-    @NotBlank
-    @Column(nullable = false)
     private LocalDateTime wateringDate;
 
-    @NotBlank
-    @Column(nullable = false)
     private String notes;
 
     @ManyToOne(fetch = FetchType.LAZY)
