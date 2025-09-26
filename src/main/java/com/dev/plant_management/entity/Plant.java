@@ -3,6 +3,7 @@ package com.dev.plant_management.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "plants")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,8 +19,9 @@ import java.util.UUID;
 public class Plant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
 
     private String name;
 
