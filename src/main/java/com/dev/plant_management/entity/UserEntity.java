@@ -48,6 +48,9 @@ public class UserEntity implements UserDetails {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Plant> plants;
+
     @PrePersist
     public void prePersist() {
         LocalDateTime now = LocalDateTime.now();
