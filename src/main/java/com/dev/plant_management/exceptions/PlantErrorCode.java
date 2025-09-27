@@ -9,6 +9,9 @@ public enum PlantErrorCode {
     DATA_ERROR_INVALID_PASSWORD_FORMAT("400-009", "Password must be at least 8 characters long, Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
 
     DATA_ERROR_USER_NOT_FOUND("404-002", "User not found"),
+    DATA_ERROR_PLANT_NOT_FOUND("404-002", "Plant not found"),
+    DATA_ERROR_WATERINGNEED_NOT_FOUND("404-002", "Watering Need not found"),
+    DATA_ERROR_WATERINGHISTORY_NOT_FOUND("404-002", "Watering History not found"),
     DATA_ERROR_USERNAME_ALREADY_TAKEN("409-001", "Username is already taken"),
     DATA_ERROR_EMAIL_ALREADY_TAKEN("409-002", "Email is already taken"),
     DATA_ERROR_UNKNOWN_CONSTRAINT("409-999", "A database constraint violation occurred"),

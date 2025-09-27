@@ -5,6 +5,7 @@ import com.dev.plant_management.entity.UserEntity;
 import com.dev.plant_management.exceptions.PlantInvalidCredentials;
 import com.dev.plant_management.exceptions.PlantRegistrationFaild;
 import com.dev.plant_management.payload.request.LoginRequest;
+import com.dev.plant_management.payload.response.LoginResponse;
 import com.dev.plant_management.payload.response.RegisterResponse;
 import com.dev.plant_management.service.CustomUserDetailService;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,20 +47,22 @@ public class AuthController {
     private CustomUserDetailService customUserDetailService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         logger.info("Login attempt for user: {}", request.getUsername());
+        var response = new LoginResponse();
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
             logger.info("Authentication successful for user: {}", request.getUsername());
-            ResponseCookie jwtCookie = ResponseCookie.from("access", jwtUtil.generateToken(request.getUsername()))
-                    .httpOnly(true)
-                    .path("/")
-                    .maxAge(24 * 60 * 60) // 1 jour
-                    .sameSite("Strict")
-                    .build();
-            return ResponseEntity.ok().header("Set-Cookie", jwtCookie.toString()).body("authentification reussie");
+            if (auth.getPrincipal() instanceof User userDetails) {
+                var user = customUserDetailService.findByUsername(userDetails.getUsername());
+                response.setUserId(user.get().getId());
+            } else {
+                logger.warn("Principal is not an instance of CustomUserDetails. Actual class: {}", auth.getPrincipal().getClass());
+            }
+            response.setAccess( jwtUtil.generateToken(request.getUsername()));
+            return ResponseEntity.ok().body(response);
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {} | reason: {}", request.getUsername(), e.getMessage());
             throw new PlantInvalidCredentials(DATA_ERROR_INVALID_CREDENTIALS);
@@ -73,15 +78,9 @@ public class AuthController {
             logger.info("User successfully registered: {}", savedUser.getUsername());
             response.setEmail(user.getEmail());
             response.setUsername(user.getUsername());
-
-            // HttpOnlyCookie
-            ResponseCookie jwtCookie = ResponseCookie.from("access", jwtUtil.generateToken(savedUser.getUsername()))
-                    .httpOnly(true)
-                    .path("/")
-                    .maxAge(24 * 60 * 60) // 1 jour
-                    .sameSite("Strict")
-                    .build();
-            return ResponseEntity.ok().header("Set-Cookie", jwtCookie.toString()).body(response);
+            response.setId(String.valueOf(savedUser.getId()));
+            response.setAccess(jwtUtil.generateToken(savedUser.getUsername()));
+            return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             logger.error("Registration failed for user: {} | reason: {}", user.getUsername(), e.getMessage());
             throw new PlantRegistrationFaild(DATA_ERROR_REGISTRATION_FAILED);
