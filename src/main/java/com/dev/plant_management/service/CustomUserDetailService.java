@@ -13,6 +13,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import static com.dev.plant_management.exceptions.PlantErrorCode.*;
 
 @Service
@@ -61,5 +65,20 @@ public class CustomUserDetailService implements UserDetailsService {
 
         logger.info("User registered successfully with id: {}", savedUser.getId());
         return savedUser;
+    }
+    public Optional<UserEntity> findById(UUID id) {
+        return userRepository.findById(id);
+    }
+
+    public Optional<UserEntity> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public List<UserEntity> findAll() {
+        return userRepository.findAll();
+    }
+
+    public void delete(UUID id) {
+        userRepository.deleteById(id);
     }
 }
